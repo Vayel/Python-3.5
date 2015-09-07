@@ -886,7 +886,7 @@ et l'auteur est actuellement en train de préparer une PEP à ce sujet.
 ## Interpolation de chaines
 
 Les interpolations directs de chaines de caractèrent existent dans de nombreux langages : PHP, C#, Ruby, Swift, Perl, etc.
-Un exemple en Perl est par exemple :
+Voici un exemple en Perl :
 
 ```perl
 my $a = 1;
