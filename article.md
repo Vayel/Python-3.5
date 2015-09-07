@@ -4,8 +4,8 @@ Une nouvelle version du langage [Python](https://www.python.org/) (et par consé
 Cette version 3.5 sera certainement perçue par les Pythonistes comme celle qui
 aura introduit le plus de changements au langage depuis Python 3.0. En effet,
 nous allons découvrir ensemble qu'avec cette nouvelle version, Python achève
-d'inclure pour de bon dans le langage un nouveau paradigme de programmation
-moderne, revenu au goût du jour avec l'éclosion de Node.js : la programmation
+d'inclure dans le langage le support d'un paradigme de programmation moderne,
+revenu au goût du jour avec l'éclosion de Node.js : la programmation
 asynchrone.
 
 [^ndbp_date_34]: Le 16 Mars 2014 pour être précis.
@@ -740,7 +740,7 @@ dans ces deux sections en profitant des retours. Déjà quelques remarques ont �
 
 La généralisation de l'*unpacking* pourrait elle aussi continuer. Dans un premier temps la
 [PEP 448](https://www.python.org/dev/peps/pep-0448/#variations) proposait initialement d'autres généralisations qui n'ont
-pas été retenues pour Python 3.5 par manque de temps. Elles seront donc propablement rapidement re-discutées. De plus, ces ajouts dans Python 3.5 ont
+pas été retenues pour Python 3.5 par manque de temps. Elles seront donc propablement rapidement rediscutées. De plus, ces ajouts dans Python 3.5 ont
 donné des idées à d'autres développeurs et quelques [nouvelles modifications](http://code.activestate.com/lists/python-ideas/35074/)
 ont été déjà proposées.
 
@@ -852,9 +852,9 @@ l'une des premières nouvelles fonctionnalités confirmées pour la version 3.6.
 L'écriture de code concurrent en Python est toujours un sujet chaud. A ce jour, trois solutions existent dans la
 bibliotèque standard :
 
- - *asyncio*, bien que limité à un seul *thread*, permet d'écrire des coroutines s'excutant en concurrence en tirant
- partie des temps d'attentes introduits par les entrées/sorties.
- - *threading* permet de facilement exécuter du code sur plusieurs *threads* mais restent limitées à un seul
+ - *asyncio*, bien que limitée à un seul *thread*, permet d'écrire des coroutines s'exécutant en concurrence en tirant
+ partie des temps d'attente introduits par les entrées/sorties.
+ - *threading* permet de facilement exécuter du code sur plusieurs *threads*, mais leur exécution reste limitée à un seul
  coeur de processeur à cause du GIL[^ndbp_gil].
  - *multiprocessing*, en *forkant* l'interpréteur, permet d'éxecuter plusieurs codes Python en parralèle sans limitation
  et exploitant pleinnement les ressources calculatoires des processeurs.
@@ -862,14 +862,14 @@ bibliotèque standard :
 [[a]]
 | Le [GIL](https://en.wikipedia.org/wiki/Global_Interpreter_Lock) est une construction implémentée dans de nompreux interpéteurs (CPython, Pypy, Ruby, etc.). Ce mécanisme bloque l'interpréteur pour qu'à chaque instant, un seul code puisse être executé. Ce sytème permet de s'assurer que du code éxécuté sur plusieurs *threads* ne va pas poser de problèmes de concurrence sur la mémoire, sans vraiment ralentir les codes n'utilisant qu'un seul *thread*. Malheureusement cela nous empèche d'exploiter les architectures multi-coeurs de nos processeurs.
 
-La multiplicité des solutions ne résoud pas tout. En effet les limitation des *threads* en python les rend inutiles
+La multiplicité des solutions ne résoud pas tout. En effet les limitation des *threads* en python les rendent inutiles
 quand le traitement exploite principalement le processeur. L'utilisation de *multiprocessing* est alors possible, mais
 a un coût :
 
  - Le lancement d'un processus entraine un *fork* au niveau du système d'exploitation, ce qui prend plus de temps et de
  mémoire que le lancement d'un *thread* (presque gratuit en comparaison).
  - La communication entre les processus est aussi plus longue. Tandis que les *threads* permettent d'exploiter un
-espace partagé en mémoire, rendant leure communcations directes, les processus nécessitent de mettre en places des mecanismes complexes, appelés
+espace partagé en mémoire, rendant leurs communcations directes, les processus nécessitent de mettre en place des mecanismes complexes, appelés
  [*IPC* pour "communications inter-processus"](https://fr.wikipedia.org/wiki/Communication_inter-processus).
 
 [Une proposition sur *python-ideas*](http://code.activestate.com/lists/python-ideas/34051/) a été formulée au début de
@@ -918,9 +918,9 @@ print("Resultat = a + b = %d + %d = %d" % (a, b, a + b))
 print("Resultat = a + b = {a} + {b} = {c}".format(a=a, b=b, c=a + b))
 ```
 
-Nous voyons ainsi qu'il est nécessaire de passer explicitement les variables et, même si il est possible d'utiliser
+Nous voyons ainsi qu'il est nécessaire de passer explicitement les variables et, même s'il est possible d'utiliser
 `locals()` ou `globals()` pour s'en passer, il reste impossible d'évaluer une expression, comme ici l'addition, ailleurs
-qu'à l'exterieur de la chaine de caractères.
+qu'à l'extérieur de la chaine de caractères.
 
 La première proposition effectuée, formalisée par la [PEP 498](https://www.python.org/dev/peps/pep-0498/) propose de rajouter
 cette possibilité dans python grâce à un nouveau préfixe de chaine, `f` pour `format-string`, dont voici un exemple
@@ -952,4 +952,4 @@ mais, à défaut de consensus, les *f-string* simples seront implémentées dans
 
 -------
 
-TODO: Conclusion général
+TODO: Conclusion générale
