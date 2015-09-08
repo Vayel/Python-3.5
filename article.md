@@ -886,7 +886,7 @@ et l'auteur est actuellement en train de préparer une PEP à ce sujet.
 ## Interpolation de chaines
 
 Les interpolations directs de chaines de caractèrent existent dans de nombreux langages : PHP, C#, Ruby, Swift, Perl, etc.
-Un exemple en Perl est par exemple :
+En voici un exemple en Perl :
 
 ```perl
 my $a = 1;
@@ -911,7 +911,7 @@ Nous voyons ainsi qu'il est necessaire de passer explicitement les variables et,
 qu'à l'exterieur de la chaine de caractère. 
 
 La première proposition effectué, formalisé par le [PEP 498](https://www.python.org/dev/peps/pep-0498/) propose de rajouter
-cette possibilité dans python gràce à un nouveau préfixe de chaine, `f` pour `format-string`, dont voici un exemple 
+cette possibilité dans python grâce à un nouveau préfixe de chaine, `f` pour `format-string`, dont voici un exemple 
 d'utilisation issue de la PEP :
 
 ```python
@@ -926,7 +926,7 @@ d'utilisation issue de la PEP :
 ```
 
 Cette proposition a fait des émules. Plusieurs développeurs ont mit en évidence que la méthodes d'interpolation peut 
-dépendre du contexte. Par exemple un module de base de donnée comme [`sqlite3`](https://docs.python.org/3.4/library/sqlite3.html)
+dépendre du contexte. Par exemple un module de base de données comme [`sqlite3`](https://docs.python.org/3.4/library/sqlite3.html)
 propose un système de substitution personnalisé pour éviter les attaques par injection ou encore les moteurs de *templates* pour 
 produire du HTML vont aussi faire des substitutions pour échapper certains caractères comme remplacer `<` ou `>` par, 
 respectivement, `&lt;` ou `&gt;`. La [PEP 501](https://www.python.org/dev/peps/pep-0501/) propose aux developpeurs de définir
