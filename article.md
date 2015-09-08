@@ -33,7 +33,7 @@ Les plus pressés peuvent profiter de ce court résumé [des principales nouveau
  - [PEP 465](http://www.python.org/dev/peps/pep-0465) : l'opérateur binaire `@` est introduit pour gérer la multiplication matricielle et permet d'améliorer la lisibilité d'expressions mathématiques. Par exemple, l'équation $A \times B^T - C^{-1}$ correspondrait au code suivant avec `numpy`.
 
     ```python
-    >>> A @ B.T - inv(C)
+    A @ B.T - inv(C)
     ```
 
  - [PEP 492](https://www.python.org/dev/peps/pep-0492) : les coroutines deviennent une construction spécifique du langage, avec l'introduction des mots-clés `async` et `await`. L'objectif étant de compléter le support de la programmation asynchrone dans Python, ils permettent d'écrire des coroutines utilisables avec `asyncio` de façon similaire à des fonctions Python synchrones classiques. Par exemple :
@@ -57,6 +57,263 @@ Les plus pressés peuvent profiter de ce court résumé [des principales nouveau
     ```
 
 # Principales nouveautés
+
+
+
+
+## *Unpacking* généralisé -- PEP 448
+
+L'*unpacking* est une opération permetant de séparer un itérable en plusieurs
+variables :
+
+```python
+>>> l = (1, 2, 3, 4)
+>>> a, b, *c = l
+>>> a
+1
+>>> b
+2
+>>> c
+(3, 4)
+>>> d, e = c
+>>> d
+3
+>>> e
+4
+```
+
+Il est alors possible de passer un itérable comme argument de fonction comme
+si son contenu était passé élément par élément grâce à l'opérateur `*` ou de
+passer un dictionnaire comme arguments nommés avec l'opérateur `**` :
+
+```python
+>>> def spam(a, b):
+...    return a + b
+...
+>>> l = (1, 2)
+>>> spam(*l)
+3    # 1 + 2
+>>> d = {"b": 2, "a": 3}
+>>> spam(**d)
+5    # 3 + 2
+```
+
+Cette fonctionnalité restait jusqu'à maintenant limitée et les conditions
+d'utilisation très strictes. Deux de ces contraintes ont été levées...
+
+### Support de l'*unpacking* dans les déclarations d'itérables
+
+Lorsque vous souhaitez définir un `tuple`, `list`, `set` ou `dict` litéral, il
+est maintenant possible d'utiliser l'*unpacking*.
+
+```python
+# Python 3.4
+>>> tuple(range(4)) + (4,)
+(0, 1, 2, 3, 4)
+# Python 3.5
+>>> (*range(4), 4)
+(0, 1, 2, 3, 4)
+
+# Python 3.4
+>>> list(range(4)) + [4]
+[0, 1, 2, 3, 4]
+# Python 3.5
+>>> [*range(4), 4]
+[0, 1, 2, 3, 4]
+
+# Python 3.4
+>>> set(range(4)) + {4}
+set(0, 1, 2, 3, 4)
+# Python 3.5
+>>> {*range(4), 4}
+set(0, 1, 2, 3, 4)
+
+# Python 3.4
+>>> d = {'x': 1}
+>>> d.update({'y': 2})
+>>> d
+{'x': 1, 'y': 2}
+# Python 3.5
+>>> {'x': 1, **{'y': 2}}
+{'x': 1, 'y': 2}
+
+# Python 3.4
+>>> combinaison = long_dict.copy()
+>>> combination.update({'b': 2})
+# Python 3.5
+>>> combinaison = {**long_dict, 'b': 2}
+```
+
+Notamment, il devient maintenant facile de sommer des itérables pour en former
+un autre.
+
+```python
+>>> l1 = (1, 2)
+>>> l2 = [3, 4]
+>>> l3 = range(5, 7)
+
+# Python 3.5
+>>> combinaison = [*l1, *l2, *l3, 7]
+>>> combinaison
+[1, 2, 3, 4, 5, 6, 7]
+
+# Python 3.4
+>>> combinaison = list(l1) + list(l2) + list(l3) + [7]
+>>> combinaison
+[1, 2, 3, 4, 5, 6, 7]
+```
+
+Cette dernière généralisation permet ainsi d'apporter une symétrie par rapport
+aux possibilités précédentes.
+
+```python
+# Possible en Python 3.4 et 3.5
+>>> elems = [1, 2, 3, 4]
+>>> fst, *other, lst = elems
+>>> fst
+1
+>>> other
+[2, 3]
+>>> lst
+4
+
+# Possible uniquement en Python 3.5
+>>> fst = 1
+>>> other = [2, 3]
+>>> lst = 4
+>>> elems = fst, *other, lst
+>>> elems
+(1, 2, 3, 4)
+```
+
+### Support de plusieurs *unpacking* dans les appels de fonctions
+
+Cette généralisation se répercute sur les appels de fonctions ou méthodes :
+jusqu'à Python 3.4, un seul itérable pouvait être utilisé lors de l'appel à
+une fonction. Cette restriction est maintenant levée.
+
+```python
+>>> def spam(a, b, c, d, e):
+...    return a + b + c + d + e
+...
+>>> l1 = (2, 1)
+>>> l2 = (4, 5)
+>>> spam(*l1, 3, *l2)        # Légal en Python 3.5, impossible en Python 3.4
+15                           # 2 + 1 + 3 + 4 + 5
+>>> d1 = {"b": 2}
+>>> d2 = {"d": 1, "a": 5, "e": 4}
+>>> spam(**d1, c=3, **d2)    # Légal en Python 3.5, impossible en Python 3.4
+15                           # 5 + 2 + 3 + 1 + 4
+>>> spam(*(1, 2), **{"c": 3, "e": 4, "d": 5})
+15                           # 1 + 2 + 3 + 5 + 4
+```
+
+Notez que si un nom de paramètre est présent dans plusieurs dictionnaires,
+c'est la valeur du dernier dictionnaire qui sera prise en compte.
+
+D'autres généralisations [sont mentionnées dans la PEP](https://www.python.org/dev/peps/pep-0448/#variations)
+mais n'ont pas été implémentées à cause d'un manque de popularité parmi les
+developpeurs de Python. Il n'est cependant pas impossible que d'autres
+fonctionnalités soient introduites dans les prochaines versions.
+
+## Opérateur de multiplication matricielle -- PEP 465
+
+L'introduction d'un opérateur binaire n'est pas courant dans Python.
+Aucun dans la série 3.x, le dernier ajout semble être
+[l'opérateur `//` dans Python 2.2](https://www.python.org/dev/peps/pep-0238/)[^ndbp_op_bin].
+Regardons donc pour quelles raisons celui-ci a été introduit.
+
+
+[^ndbp_op_bin]: Ces ajouts sont tellement peu courants qu'il est difficile de
+trouver des traces de ces modifications. L'opérateur `//` semble être le seul
+ajout de toute la série 2.
+
+### Signification
+
+Ce nouvel opérateur est dédié à la multiplication matricielle. En effet,
+comme tous ceux qui ont fait un peu de mathématiques algébriques doivent le
+savoir, pour une matrice on définit généralement la multiplication par
+l'opération suivante (pour des matrices $2*2$) :
+
+$$
+\begin{pmatrix}a&b \\ c&d \end{pmatrix} \cdot \begin{pmatrix}e&f \\ g&h \end{pmatrix} =
+\begin{pmatrix}a*e+b*g&a*f+b*h \\ c*e+d*g&c*f+d*h \end{pmatrix}
+$$
+
+Or il est souvent aussi nécessaire d'effectuer des multiplications
+terme à terme :
+
+$$
+\begin{pmatrix}a&b \\ c&d \end{pmatrix} * \begin{pmatrix}e&f \\ g&h \end{pmatrix} =
+\begin{pmatrix}a*e&b*f \\ c*e&d*h \end{pmatrix}
+$$
+
+Tandis que certains langages spécialisés possèdent des opérateurs dédiés pour
+chacune de ces opérations[^ndbp_op_matmatlab] il n'y a en Python rien de
+similaire. Avec la bibliothèque [numpy](http://www.numpy.org), la plus
+populaire pour le calcul numérique dans l'éco-système Python, il est possible
+d'utiliser l'opérateur natif `*` pour effectuer une multiplication terme à
+terme, surcharge d'opérateur se rencontrant dans la plupart des bibliothèques
+faisant intervenir les matrices. Mais il n'existe ainsi plus de moyen simple
+pour effectuer une multiplication matricielle (l'opérateur `*` étant déjà pris).
+Avec `numpy`, il est pour le moment nécessaire d'utiliser la méthode `dot` et
+d'écrire des lignes de la forme :
+
+```python
+S = (H.dot(beta) - r).T.dot(inv(H.dot(V).dot(H.T))).dot(H.dot(beta) - r)
+```
+
+Celle-ci traduit cette formule :
+
+$$
+(H \times \beta - r)^T \times (H \times V \times H^T)^{-1} \times (H \times \beta - r)
+$$
+
+Cela n'aide pas à la lecture... Le nouvel opérateur `@` est introduit et
+dédié à la multiplication matricielle. Il permettra d'obtenir des expressions
+équivalentes de la forme :
+
+```python
+S = (H @ beta - r).T @ inv(H @ V @ H.T) @ (H @ beta - r)
+```
+
+Un peu mieux, non ?
+
+[^ndbp_op_matmatlab]: Par exemple, avec Matlab et Julia, `*` / `.*` servent respectivement pour la multiplication matricielle et terme à terme.
+
+### Impact sur vos codes
+
+Cette introduction devrait être anodine pour beaucoup d'utilisateurs. En effet,
+aucun objet de la bibliothèque standard ne va l'utiliser[^ndbp_nused]. Cet
+opérateur binaire servira principalement pour des bibliothèques annexes, à
+commencer par *numpy*.
+
+[^ndbp_nused]: Ce qui est rare mais existe déjà. En particulier l'objet `Elipsis` créé avec `...`.
+
+Si vous souhaitez supporter cet opérateur, trois méthodes spéciales peuvent
+être implémentées : `__matmul__` et `__rmatmul__` pour la forme `a @ b` et
+`__imatmul__` pour la forme `a @= b`, de façon similaire aux autres opérateurs.
+
+À noter qu'il est déconseillé d'utiliser cet opérateur pour autre chose que
+les multiplications matricielles.
+
+### Motivation
+
+L'introduction de cet opérateur est un modèle du genre : il peut sembler très
+spécifique mais est pleinement justifié. La lecture de la PEP, développée, est
+très instructive. Pour la faire adopter, les principales bibliothèques
+scientifiques en Python ont préparé cette PEP ensemble pour arriver à une
+solution convenant à la grande partie de la communauté scientifique, assurant
+dès lors l'adoption rapide de cet opérateur. La PEP précise ainsi l’intérêt et
+les problèmes engendrés par les autres solutions utilisées jusque-là. Enfin
+cette PEP a été fortement appuyée par [la grande popularité de Python dans le
+monde
+scientifique](https://www.python.org/dev/peps/pep-0465/#but-isn-t-matrix-multiplication-a-pretty-niche-requirement).
+Ainsi on apprend que `numpy` est le module n’appartenant pas à la bibliothèque
+standard le plus utilisé parmi tous les codes Python présents sur Github et ce
+sans compter d'autres bibliothèques comme `pylab` ou `scipy` qui vont aussi
+profiter de cette modification et comptent parmi les bibliothèques les plus
+communes.
 
 ## Support des coroutines -- PEP 492
 
@@ -320,105 +577,6 @@ employer les générateurs si vous souhaitez conserver le support de Python 3.4.
 L'ajout des méthodes de la forme `__a****__` peut vous permettre cependant de
 supporter les nouveautés de Python 3.5, mais n'est pas obligatoire.
 
-## Opérateur de multiplication matricielle -- PEP 465
-
-L'introduction d'un opérateur binaire n'est pas courant dans Python.
-Aucun dans la série 3.x, le dernier ajout semble être
-[l'opérateur `//` dans Python 2.2](https://www.python.org/dev/peps/pep-0238/)[^ndbp_op_bin].
-Regardons donc pour quelles raisons celui-ci a été introduit.
-
-
-[^ndbp_op_bin]: Ces ajouts sont tellement peu courants qu'il est difficile de
-trouver des traces de ces modifications. L'opérateur `//` semble être le seul
-ajout de toute la série 2.
-
-### Signification
-
-Ce nouvel opérateur est dédié à la multiplication matricielle. En effet,
-comme tous ceux qui ont fait un peu de mathématiques algébriques doivent le
-savoir, pour une matrice on définit généralement la multiplication par
-l'opération suivante (pour des matrices $2*2$) :
-
-$$
-\begin{pmatrix}a&b \\ c&d \end{pmatrix} \cdot \begin{pmatrix}e&f \\ g&h \end{pmatrix} =
-\begin{pmatrix}a*e+b*g&a*f+b*h \\ c*e+d*g&c*f+d*h \end{pmatrix}
-$$
-
-Or il est souvent aussi nécessaire d'effectuer des multiplications
-terme à terme :
-
-$$
-\begin{pmatrix}a&b \\ c&d \end{pmatrix} * \begin{pmatrix}e&f \\ g&h \end{pmatrix} =
-\begin{pmatrix}a*e&b*f \\ c*e&d*h \end{pmatrix}
-$$
-
-Tandis que certains langages spécialisés possèdent des opérateurs dédiés pour
-chacune de ces opérations[^ndbp_op_matmatlab] il n'y a en Python rien de
-similaire. Avec la bibliothèque [numpy](http://www.numpy.org), la plus
-populaire pour le calcul numérique dans l'éco-système Python, il est possible
-d'utiliser l'opérateur natif `*` pour effectuer une multiplication terme à
-terme, surcharge d'opérateur se rencontrant dans la plupart des bibliothèques
-faisant intervenir les matrices. Mais il n'existe ainsi plus de moyen simple
-pour effectuer une multiplication matricielle (l'opérateur `*` étant déjà pris).
-Avec `numpy`, il est pour le moment nécessaire d'utiliser la méthode `dot` et
-d'écrire des lignes de la forme :
-
-```python
-S = (H.dot(beta) - r).T.dot(inv(H.dot(V).dot(H.T))).dot(H.dot(beta) - r)
-```
-
-Celle-ci traduit cette formule :
-
-$$
-(H \times \beta - r)^T \times (H \times V \times H^T)^{-1} \times (H \times \beta - r)
-$$
-
-Cela n'aide pas à la lecture... Le nouvel opérateur `@` est introduit et
-dédié à la multiplication matricielle. Il permettra d'obtenir des expressions
-équivalentes de la forme :
-
-```python
-S = (H @ beta - r).T @ inv(H @ V @ H.T) @ (H @ beta - r)
-```
-
-Un peu mieux, non ?
-
-[^ndbp_op_matmatlab]: Par exemple, avec Matlab et Julia, `*` / `.*` servent respectivement pour la multiplication matricielle et terme à terme.
-
-### Impact sur vos codes
-
-Cette introduction devrait être anodine pour beaucoup d'utilisateurs. En effet,
-aucun objet de la bibliothèque standard ne va l'utiliser[^ndbp_nused]. Cet
-opérateur binaire servira principalement pour des bibliothèques annexes, à
-commencer par *numpy*.
-
-[^ndbp_nused]: Ce qui est rare mais existe déjà. En particulier l'objet `Elipsis` créé avec `...`.
-
-Si vous souhaitez supporter cet opérateur, trois méthodes spéciales peuvent
-être implémentées : `__matmul__` et `__rmatmul__` pour la forme `a @ b` et
-`__imatmul__` pour la forme `a @= b`, de façon similaire aux autres opérateurs.
-
-À noter qu'il est déconseillé d'utiliser cet opérateur pour autre chose que
-les multiplications matricielles.
-
-### Motivation
-
-L'introduction de cet opérateur est un modèle du genre : il peut sembler très
-spécifique mais est pleinement justifié. La lecture de la PEP, développée, est
-très instructive. Pour la faire adopter, les principales bibliothèques
-scientifiques en Python ont préparé cette PEP ensemble pour arriver à une
-solution convenant à la grande partie de la communauté scientifique, assurant
-dès lors l'adoption rapide de cet opérateur. La PEP précise ainsi l’intérêt et
-les problèmes engendrés par les autres solutions utilisées jusque-là. Enfin
-cette PEP a été fortement appuyée par [la grande popularité de Python dans le
-monde
-scientifique](https://www.python.org/dev/peps/pep-0465/#but-isn-t-matrix-multiplication-a-pretty-niche-requirement).
-Ainsi on apprend que `numpy` est le module n’appartenant pas à la bibliothèque
-standard le plus utilisé parmi tous les codes Python présents sur Github et ce
-sans compter d'autres bibliothèques comme `pylab` ou `scipy` qui vont aussi
-profiter de cette modification et comptent parmi les bibliothèques les plus
-communes.
-
 ## Annotations de types -- PEP 484
 
 Les annotations de fonctions [existent depuis Python 3](https://www.python.org/dev/peps/pep-3107/)
@@ -527,160 +685,6 @@ existe déjà plusieurs dans le monde Python ([PEP 333](https://www.python.org/d
 etc.). Cet ajout n'a donc aucun impact direct sur vos codes mais permettra aux
 outils externes de vous fournir du support supplémentaire.
 
-## *Unpacking* généralisé -- PEP 448
-
-L'*unpacking* est une opération permetant de séparer un itérable en plusieurs
-variables :
-
-```python
->>> l = (1, 2, 3, 4)
->>> a, b, *c = l
->>> a
-1
->>> b
-2
->>> c
-(3, 4)
->>> d, e = c
->>> d
-3
->>> e
-4
-```
-
-Il est alors possible de passer un itérable comme argument de fonction comme
-si son contenu était passé élément par élément grâce à l'opérateur `*` ou de
-passer un dictionnaire comme arguments nommés avec l'opérateur `**` :
-
-```python
->>> def spam(a, b):
-...    return a + b
-...
->>> l = (1, 2)
->>> spam(*l)
-3    # 1 + 2
->>> d = {"b": 2, "a": 3}
->>> spam(**d)
-5    # 3 + 2
-```
-
-Cette fonctionnalité restait jusqu'à maintenant limitée et les conditions
-d'utilisation très strictes. Deux de ces contraintes ont été levées...
-
-### Support de l'*unpacking* dans les déclarations d'itérables
-
-Lorsque vous souhaitez définir un `tuple`, `list`, `set` ou `dict` litéral, il
-est maintenant possible d'utiliser l'*unpacking*.
-
-```python
-# Python 3.4
->>> tuple(range(4)) + (4,)
-(0, 1, 2, 3, 4)
-# Python 3.5
->>> (*range(4), 4)
-(0, 1, 2, 3, 4)
-
-# Python 3.4
->>> list(range(4)) + [4]
-[0, 1, 2, 3, 4]
-# Python 3.5
->>> [*range(4), 4]
-[0, 1, 2, 3, 4]
-
-# Python 3.4
->>> set(range(4)) + {4}
-set(0, 1, 2, 3, 4)
-# Python 3.5
->>> {*range(4), 4}
-set(0, 1, 2, 3, 4)
-
-# Python 3.4
->>> d = {'x': 1}
->>> d.update({'y': 2})
->>> d
-{'x': 1, 'y': 2}
-# Python 3.5
->>> {'x': 1, **{'y': 2}}
-{'x': 1, 'y': 2}
-
-# Python 3.4
->>> combinaison = long_dict.copy()
->>> combination.update({'b': 2})
-# Python 3.5
->>> combinaison = {**long_dict, 'b': 2}
-```
-
-Notamment, il devient maintenant facile de sommer des itérables pour en former
-un autre.
-
-```python
->>> l1 = (1, 2)
->>> l2 = [3, 4]
->>> l3 = range(5, 7)
-
-# Python 3.5
->>> combinaison = [*l1, *l2, *l3, 7]
->>> combinaison
-[1, 2, 3, 4, 5, 6, 7]
-
-# Python 3.4
->>> combinaison = list(l1) + list(l2) + list(l3) + [7]
->>> combinaison
-[1, 2, 3, 4, 5, 6, 7]
-```
-
-Cette dernière généralisation permet ainsi d'apporter une symétrie par rapport
-aux possibilités précédentes.
-
-```python
-# Possible en Python 3.4 et 3.5
->>> elems = [1, 2, 3, 4]
->>> fst, *other, lst = elems
->>> fst
-1
->>> other
-[2, 3]
->>> lst
-4
-
-# Possible uniquement en Python 3.5
->>> fst = 1
->>> other = [2, 3]
->>> lst = 4
->>> elems = fst, *other, lst
->>> elems
-(1, 2, 3, 4)
-```
-
-### Support de plusieurs *unpacking* dans les appels de fonctions
-
-Cette généralisation se répercute sur les appels de fonctions ou méthodes :
-jusqu'à Python 3.4, un seul itérable pouvait être utilisé lors de l'appel à
-une fonction. Cette restriction est maintenant levée.
-
-```python
->>> def spam(a, b, c, d, e):
-...    return a + b + c + d + e
-...
->>> l1 = (2, 1)
->>> l2 = (4, 5)
->>> spam(*l1, 3, *l2)        # Légal en Python 3.5, impossible en Python 3.4
-15                           # 2 + 1 + 3 + 4 + 5
->>> d1 = {"b": 2}
->>> d2 = {"d": 1, "a": 5, "e": 4}
->>> spam(**d1, c=3, **d2)    # Légal en Python 3.5, impossible en Python 3.4
-15                           # 5 + 2 + 3 + 1 + 4
->>> spam(*(1, 2), **{"c": 3, "e": 4, "d": 5})
-15                           # 1 + 2 + 3 + 5 + 4
-```
-
-Notez que si un nom de paramètre est présent dans plusieurs dictionnaires,
-c'est la valeur du dernier dictionnaire qui sera prise en compte.
-
-D'autres généralisations [sont mentionnées dans la PEP](https://www.python.org/dev/peps/pep-0448/#variations)
-mais n'ont pas été implémentées à cause d'un manque de popularité parmi les
-developpeurs de Python. Il n'est cependant pas impossible que d'autres
-fonctionnalités soient introduites dans les prochaines versions.
 
 # De plus petits changements
 
