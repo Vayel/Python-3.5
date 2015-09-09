@@ -324,8 +324,6 @@ communes.
 
 ## Support des coroutines -- PEP 492
 
-### Contexte
-
 #### Introduction à la programmation asynchrone
 
 Pour comprendre ce qu'est la programmation asynchrone, penchons-nous sur l'exemple
@@ -362,7 +360,7 @@ if __name__ == "__main__":
 Lors d'un appel à ce genre de fonction très simple votre processeur passe son temps... à ne
 rien faire ! En effet, quand il n'attend pas le serveur Web, il patiente le temps
 que le disque effectue les opérations d'écriture demandées. Or tout cela est très
-lent à l'échelle d'un processeur. Et tous ces appels à des services extérieurs
+lent à l'échelle d'un processeur, et tous ces appels à des services extérieurs
 sont très courants en Web : connexion et requêtes à une base de données, appels à
 une API externe, etc. La perte de temps est de ce fait considérable.
 
@@ -377,13 +375,13 @@ qu'on pourrait résumer par les opérations suivantes :
  1. Prendre une tâche disponible
  2. Exécuter la tâche jusqu'à ce qu'elle soit terminée ou qu'elle doive attendre des entrées/sorties
  3. Dans le second cas, la mettre dans une liste de tâches en attente
- 4. Mettre les tâches en attente ayant reçu leurs données dans la liste des tâches disponibles
+ 4. Mettre dans la liste des tâches disponibles les tâches en attente ayant reçu leurs données
  5. Retourner en 1
 
 Prenons un exemple, avec un serveur Web :
 
 - Un client `A` demande une page, appelant ainsi une fonction `f`
-- Un client `B` demande une page, appelant une autre fonction `g`, appel mis en attente vu que le processeur est occupé avec le client A
+- Un client `B` demande une page, appelant une autre fonction `g`, appel mis en attente vu que le processeur est occupé avec le client `A`
 - L'appel à `f` atteint une écriture dans un fichier, et se met en pause le temps que le disque fasse son travail
 - `g` est démarrée
 - L'écriture sur le disque de `f` est terminée
@@ -398,7 +396,7 @@ déroulent à l'extérieur...
 
 [[i]]
 | Nous nous comportons naturellement de cette manière dans la vie. Par exemple,
-| si vous effectuez un rapport que vous devez faire relire à votre chef : après
+| lorsque vous effectuez un rapport que vous devez faire relire à votre chef : après
 | lui avoir fait parvenir une première version, vous allez devoir attendre qu'il
 | l'ait étudié avant de le corriger ; plutôt que de patienter bêtement devant son
 | bureau, vous vaquez à vos occupations, et serez informé lorsque le rapport pourra
@@ -490,7 +488,7 @@ un code asynchrone lisible. Toutefois :
 
  - Il y a détournement du rôle d'origine de l'instruction `yield from`. Sans le décorateur la fonction pourrait être facilement confondue avec un générateur classique, sans rapport avec de l'asynchrone.
  - Tandis que l'exemple d'origine utilisait `with` pour assurer la fermeture du fichier même en cas d'exception, nous sommes obligés ici de reproduire manuellement le comportement de cette instruction. En effet `with` n'est pas prévue pour appeler des coroutines, donc on ne peut effectuer de manière asynchrone les opérations d'entrée (ligne 16) ni de sortie (ligne 31).
- - De la même façon, l'instruction `for` ne permet pas de lire un itérable de manière asynchrone comme fait ligne 21. Il nous faut donc passer peu élégamment par une boucle `while`.
+ - De la même façon, l'instruction `for` ne permet pas de lire un itérable de manière asynchrone, comme fait ligne 21. Il nous faut donc passer peu élégamment par une boucle `while`.
 
 ### Les nouveaux mot-clés
 
@@ -519,7 +517,7 @@ l'instruction `async with`, en utilisant les méthodes `__aenter__` et `__aexit_
 Il est donc possible, et conseillé, en Python 3.5 de ré-écrire le code précédent de la manière
 suivante.
 
-```python hl_lines="12"
+```python
 import asyncio
 import aiohttp
 import aiofiles
@@ -548,12 +546,12 @@ utilisant des fonctions classiques présentées en début de section.
 
 [[a]]
 | Le dernier exemple de codes est un aperçu de ce que pourrait être la
-| programmation asynchrone avec Python 3.5. A l'heure où ces lignes sont écrites
+| programmation asynchrone avec Python 3.5. À l'heure où ces lignes sont écrites, 
 | *aiohttp* et *aiohttp* ne supportent pas encore les nouvelles instructions `async for`
 | et `async with`. De la même manière, pour l'instant, seul *asyncio* gère les mot-clés
 | `async` et `await` au niveau de sa boucle événementielle.
 
-Enfin, notez que les expressions `await`, au delà de leur précédence beaucoup plus
+Enfin, notez que les expressions `await`, au-delà de leur précédence beaucoup plus
 faible, sont moins restreintes que les `yield from` et peuvent être placées partout
 où une expression est attendue. Ainsi les codes suivants sont valides.
 
@@ -581,13 +579,13 @@ Ces modifications restent donc parfaitement rétro-compatibles avec Python 3.4.
 
 Si vous utilisez *asyncio*, rien ne change pour vous et vous pouvez continuer à
 employer les générateurs si vous souhaitez conserver le support de Python 3.4.
-L'ajout des méthodes de la forme `__a****__` peut vous permettre cependant de
-supporter les nouveautés de Python 3.5, mais n'est pas obligatoire.
+L'ajout des méthodes de la forme `__a****__` n'est donc pas obligatoire, mais peut 
+vous permettre cependant de supporter les nouveautés de Python 3.5.
 
 ## Annotations de types -- PEP 484
 
 Les annotations de fonctions [existent depuis Python 3](https://www.python.org/dev/peps/pep-3107/)
-et permettent d'attacher des objets Python quelconques aux arguments
+et permettent d'attacher des objets Python aux arguments
 et à la valeur de retour d'une fonction ou d'une méthode :
 
 ```python
@@ -632,14 +630,17 @@ contentons de l'exemple suivant.
 # - Tuple pour décrire un tuple
 from typing import TypeVar, Iterable, Tuple
 
-# Nous définissons ici un type générique pouvant être un des types de nombres cités.
+# Nous définissons ici un type générique pouvant être un des types numériques cités.
 T = TypeVar('T', int, float, complex)
-# Vecteur représente un itérateur (list, tuple, etc.) contenant des tuples comportant chacun deux éléments de type T.
+# Vecteur représente un itérateur (list, tuple, etc.) contenant des tuples 
+# comportant chacun deux éléments de type T.
 Vecteur = Iterable[Tuple[T, T]]
 
-# Pour déclarer un itérable de tuples, sans spécifier le contenu de ces derniers, nous pouvons utiliser le type natif :
+# Pour déclarer un itérable de tuples, sans spécifier le contenu de ces derniers, 
+# nous pouvons utiliser le type natif :
 # Vecteur2 = Iterable[tuple]
-# Les éléments présents dans le module typing sont là pour permettre une description plus complète des types de base.
+# Les éléments présents dans le module typing sont là pour permettre une 
+# description plus complète des types de base.
 
 # Nous définissons une fonction prenant un vecteur en argument et renvoyant un nombre
 def inproduct(v: Vecteur) -> T:
@@ -652,12 +653,12 @@ res = inproduct(vec)
 
 Néanmoins, les annotations peuvent surcharger les déclarations et les rendre
 peu lisibles. Cette PEP a donc introduit une convention supplémentaire : les
-fichiers `Stub`. Il a été convenu que de tels fichiers, facultifs, contiendraient
+fichiers `Stub`. Il a été convenu que de tels fichiers, facultatifs, contiendraient
 les annotations de types, permettant ainsi de profiter de ces informations sans
 polluer le code source. Ces fichiers permettent aussi d'annoter les fonctions
 de bibliothèques écrites en C ou de fournir les annotations de types pour des
 modules utilisant les annotations pour une autre fonctionnalité. Par exemple,
-le module `datetime` de la bliotèque standard comporterait un fichier `Stub` de
+le module `datetime` de la bibliothèque standard comporterait un fichier `Stub` de
 la forme suivante.
 
 
@@ -686,7 +687,7 @@ ou encore les analyseurs de code statiques comme [mypy](http://mypy-lang.org/),
 lequel a fortement inspiré cette PEP et sera probablement le premier outil à
 proposer un support complet de cette fonctionnalité.
 
-Les annotations de types sont donc qu'un ensemble de conventions, comme il en
+Les annotations de types ne sont donc qu'un ensemble de conventions, comme il en
 existe déjà plusieurs dans le monde Python ([PEP 333](https://www.python.org/dev/peps/pep-0333/),
 [PEP 8](https://www.python.org/dev/peps/pep-0008/), [PEP 257](https://www.python.org/dev/peps/pep-0257/),
 etc.). Cet ajout n'a donc aucun impact direct sur vos codes mais permettra aux
