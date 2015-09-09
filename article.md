@@ -655,11 +655,8 @@ Néanmoins, les annotations peuvent surcharger les déclarations et les rendre
 peu lisibles. Cette PEP a donc introduit une convention supplémentaire : les
 fichiers `Stub`. Il a été convenu que de tels fichiers, facultatifs, contiendraient
 les annotations de types, permettant ainsi de profiter de ces informations sans
-polluer le code source. Ces fichiers permettent aussi d'annoter les fonctions
-de bibliothèques écrites en C ou de fournir les annotations de types pour des
-modules utilisant les annotations pour une autre fonctionnalité. Par exemple,
-le module `datetime` de la bibliothèque standard comporterait un fichier `Stub` de
-la forme suivante.
+polluer le code source. Par exemple, le module `datetime` de la bibliothèque 
+standard comporterait un fichier `Stub` de la forme suivante.
 
 
 ```python
@@ -674,6 +671,10 @@ class date(object):
     def ctime(self) -> str: ...
     def weekday(self) -> int: ...
 ```
+
+Ces fichiers permettent aussi d'annoter les fonctions de bibliothèques écrites 
+en C ou de fournir des annotations de types aux modules utilisant déjà les 
+annotations pour autre chose que le *type hinting*. 
 
 Tout comme rien ne vous oblige à utiliser les annotations pour le typage, rien
 ne vous force à vous servir du module `typing` ou des fichiers `Stub` :
