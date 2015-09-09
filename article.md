@@ -12,7 +12,7 @@ asynchrone.
 
 # TL;DR - Résumé des principales nouveautés
 
-Les plus pressés peuvent profiter de ce court résumé [des principales nouveautés](https://docs.python.org/3.5/whatsnew/3.5.html) :
+Les plus pressés peuvent profiter du court résumé [des principales nouveautés](https://docs.python.org/3.5/whatsnew/3.5.html) suivant. Chacune sera reprise dans la suite de l'article, en la détaillant et explicitant les concepts sous-jacents.
 
  - [PEP 448](https://www.python.org/dev/peps/pep-0448/) : les opérations d'*unpacking* sont généralisées et peuvent maintenant être combinées et utilisées plusieurs fois dans un appel de fonction.
 
@@ -75,11 +75,14 @@ variables :
 2
 >>> c
 (3, 4)
->>> d, e = c
->>> d
-3
->>> e
-4
+>>> def f(a, b):
+...    return a + b, a - b    # f retourne un tuple
+...
+>>> somme, diff = f(5, 3)
+>>> somme
+8    # 5 + 3
+>>> diff
+2    # 5 - 3
 ```
 
 Il est alors possible de passer un itérable comme argument de fonction comme
@@ -103,7 +106,7 @@ d'utilisation très strictes. Deux de ces contraintes ont été levées...
 
 ### Support de l'*unpacking* dans les déclarations d'itérables
 
-Lorsque vous souhaitez définir un `tuple`, `list`, `set` ou `dict` litéral, il
+Lorsque vous souhaitez définir un `tuple`, `list`, `set` ou `dict` littéral, il
 est maintenant possible d'utiliser l'*unpacking*.
 
 ```python
@@ -209,7 +212,7 @@ une fonction. Cette restriction est maintenant levée.
 ```
 
 Notez que si un nom de paramètre est présent dans plusieurs dictionnaires,
-c'est la valeur du dernier dictionnaire qui sera prise en compte.
+c'est la valeur du dernier qui sera prise en compte.
 
 D'autres généralisations [sont mentionnées dans la PEP](https://www.python.org/dev/peps/pep-0448/#variations)
 mais n'ont pas été implémentées à cause d'un manque de popularité parmi les
@@ -231,9 +234,9 @@ ajout de toute la série 2.
 ### Signification
 
 Ce nouvel opérateur est dédié à la multiplication matricielle. En effet,
-comme tous ceux qui ont fait un peu de mathématiques algébriques doivent le
-savoir, pour une matrice on définit généralement la multiplication par
-l'opération suivante (pour des matrices $2*2$) :
+comme tous ceux ayant fait un peu de mathématiques algébriques le savent sûrement, 
+on définit généralement la multiplication matricielle par l'opération suivante 
+(pour des matrices $2*2$ ici) :
 
 $$
 \begin{pmatrix}a&b \\ c&d \end{pmatrix} \cdot \begin{pmatrix}e&f \\ g&h \end{pmatrix} =
@@ -255,18 +258,18 @@ populaire pour le calcul numérique dans l'éco-système Python, il est possible
 d'utiliser l'opérateur natif `*` pour effectuer une multiplication terme à
 terme, surcharge d'opérateur se rencontrant dans la plupart des bibliothèques
 faisant intervenir les matrices. Mais il n'existe ainsi plus de moyen simple
-pour effectuer une multiplication matricielle (l'opérateur `*` étant déjà pris).
+pour effectuer une multiplication matricielle.
 Avec `numpy`, il est pour le moment nécessaire d'utiliser la méthode `dot` et
 d'écrire des lignes de la forme :
 
 ```python
-S = (H.dot(beta) - r).T.dot(inv(H.dot(V).dot(H.T))).dot(H.dot(beta) - r)
+S = (A.dot(B) - C).T.dot(inv(A.dot(D).dot(A.T))).dot(A.dot(B) - C)
 ```
 
 Celle-ci traduit cette formule :
 
 $$
-(H \times \beta - r)^T \times (H \times V \times H^T)^{-1} \times (H \times \beta - r)
+(A \times B - C)^T \times (A \times D \times A^T)^{-1} \times (A \times B - C)
 $$
 
 Cela n'aide pas à la lecture... Le nouvel opérateur `@` est introduit et
@@ -274,7 +277,7 @@ dédié à la multiplication matricielle. Il permettra d'obtenir des expressions
 équivalentes de la forme :
 
 ```python
-S = (H @ beta - r).T @ inv(H @ V @ H.T) @ (H @ beta - r)
+S = (A @ B - C).T @ inv(A @ D @ A.T) @ (A @ B - C)
 ```
 
 Un peu mieux, non ?
@@ -285,14 +288,14 @@ Un peu mieux, non ?
 
 Cette introduction devrait être anodine pour beaucoup d'utilisateurs. En effet,
 aucun objet de la bibliothèque standard ne va l'utiliser[^ndbp_nused]. Cet
-opérateur binaire servira principalement pour des bibliothèques annexes, à
+opérateur binaire servira principalement à des bibliothèques annexes, à
 commencer par *numpy*.
 
 [^ndbp_nused]: Ce qui est rare mais existe déjà. En particulier l'objet `Elipsis` créé avec `...`.
 
 Si vous souhaitez supporter cet opérateur, trois méthodes spéciales peuvent
 être implémentées : `__matmul__` et `__rmatmul__` pour la forme `a @ b` et
-`__imatmul__` pour la forme `a @= b`, de façon similaire aux autres opérateurs.
+`__imatmul__` pour la forme `a @= b`, de façon similaire aux autres opérateurs binaires.
 
 À noter qu'il est déconseillé d'utiliser cet opérateur pour autre chose que
 les multiplications matricielles.
@@ -301,11 +304,15 @@ les multiplications matricielles.
 
 L'introduction de cet opérateur est un modèle du genre : il peut sembler très
 spécifique mais est pleinement justifié. La lecture de la PEP, développée, est
-très instructive. Pour la faire adopter, les principales bibliothèques
+très instructive. 
+
+Pour la faire adopter, les principales bibliothèques
 scientifiques en Python ont préparé cette PEP ensemble pour arriver à une
 solution convenant à la grande partie de la communauté scientifique, assurant
 dès lors l'adoption rapide de cet opérateur. La PEP précise ainsi l’intérêt et
-les problèmes engendrés par les autres solutions utilisées jusque-là. Enfin
+les problèmes engendrés par les autres solutions utilisées jusque-là. 
+
+Enfin
 cette PEP a été fortement appuyée par [la grande popularité de Python dans le
 monde
 scientifique](https://www.python.org/dev/peps/pep-0465/#but-isn-t-matrix-multiplication-a-pretty-niche-requirement).
