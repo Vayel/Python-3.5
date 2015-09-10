@@ -540,7 +540,7 @@ if __name__ == "__main__":
     asyncio.get_event_loop().run_until_complete(fetch_page('http://zestedesavoir.com/', 'out.html'))
 ```
 
-L'exemple ci-dessus montre clairement l'objectif de ces ajouts : si les `async`
+L'exemple ci-dessus montre clairement l'objectif de l'ajout de `async for` et `async with` : si les `async`
 et `await` sont ignorés, la coroutine est fortement similaire à une implémentation
 utilisant des fonctions classiques présentées en début de section.
 
