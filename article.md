@@ -697,7 +697,7 @@ outils externes de vous fournir du support supplémentaire.
 
 # De plus petits changements
 
- - [PEP 441](http://www.python.org/dev/peps/pep-0441) : ajout d'un module `zipapp`, pour améliorer le support et la création d'applications packagées sous forme d'archive `zip` introduit dans Python 2.6.
+ - [PEP 441](http://www.python.org/dev/peps/pep-0441) : ajout d'un module `zipapp`, pour améliorer le support et la création d'applications packagées sous forme d'archive `zip`, introduits dans Python 2.6.
  - [PEP 461](https://www.python.org/dev/peps/pep-0461/) : retour de l'opérateur de formatage `%` pour les types de données `byte` et `bytearray`, de la même façon qu'il était utilisable pour les types chaînes (`str`) dans Python 2.7.
  - [PEP 488](https://www.python.org/dev/peps/pep-0488/) : la suppression des fichiers `pyo`.
  - [PEP 489](https://www.python.org/dev/peps/pep-0489/) : un changement de la procédure d'import des modules externes.
