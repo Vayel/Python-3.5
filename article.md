@@ -811,8 +811,7 @@ Maintenant, plus rien ne semble bloquer l'implémentation de cette PEP, qui devr
 Le principal intérêt de cette modification est que le fonctionnement actuel est contre-intuitif pour bon nombre d'utilisateurs
 connaissant mal le fonctionnement interne de Python. D'autres raisons sont invoquées dans la PEP :
 
- - De manière évidente, les `OrderedDict` pourraient maintenant être créés en utilisant des arguments nommés, comme le permettent les
-   dictionnaires.
+ - L'initialisation d'un `OrderedDict` est un cas d'appel où l'ordre des paramètres importe, et de tels objets pourraient maintenant être créés en utilisant des arguments nommés, comme le permettent les dictionnaires.
  - La sérialisation : dans certains formats l'ordre d'apparition des données a de l'importance (ex : l'ordre des colonnes
    dans un fichier CSV). Cette nouvelle possibilité permettrait de les définir plus facilement, en même temps que des
    valeurs par défaut. Elle permettrait aussi à des formats comme XML, JSON ou Yaml de garantir l'ordre d'apparition
