@@ -12,7 +12,7 @@ asynchrone.
 
 # TL;DR - Résumé des principales nouveautés
 
-Les plus pressés peuvent profiter de ce court résumé [des principales nouveautés](https://docs.python.org/3.5/whatsnew/3.5.html) :
+Les plus pressés peuvent profiter du court résumé [des principales nouveautés](https://docs.python.org/3.5/whatsnew/3.5.html) suivant. Chacune sera reprise dans la suite de l'article, en la détaillant et explicitant les concepts sous-jacents.
 
  - [PEP 448](https://www.python.org/dev/peps/pep-0448/) : les opérations d'*unpacking* sont généralisées et peuvent maintenant être combinées et utilisées plusieurs fois dans un appel de fonction.
 
@@ -75,11 +75,14 @@ variables :
 2
 >>> c
 (3, 4)
->>> d, e = c
->>> d
-3
->>> e
-4
+>>> def f(a, b):
+...    return a + b, a - b    # f retourne un tuple
+...
+>>> somme, diff = f(5, 3)
+>>> somme
+8    # 5 + 3
+>>> diff
+2    # 5 - 3
 ```
 
 Il est alors possible de passer un itérable comme argument de fonction comme
@@ -103,7 +106,7 @@ d'utilisation très strictes. Deux de ces contraintes ont été levées...
 
 ### Support de l'*unpacking* dans les déclarations d'itérables
 
-Lorsque vous souhaitez définir un `tuple`, `list`, `set` ou `dict` litéral, il
+Lorsque vous souhaitez définir un `tuple`, `list`, `set` ou `dict` littéral, il
 est maintenant possible d'utiliser l'*unpacking*.
 
 ```python
@@ -209,7 +212,7 @@ une fonction. Cette restriction est maintenant levée.
 ```
 
 Notez que si un nom de paramètre est présent dans plusieurs dictionnaires,
-c'est la valeur du dernier dictionnaire qui sera prise en compte.
+c'est la valeur du dernier qui sera prise en compte.
 
 D'autres généralisations [sont mentionnées dans la PEP](https://www.python.org/dev/peps/pep-0448/#variations)
 mais n'ont pas été implémentées à cause d'un manque de popularité parmi les
@@ -231,9 +234,9 @@ ajout de toute la série 2.
 ### Signification
 
 Ce nouvel opérateur est dédié à la multiplication matricielle. En effet,
-comme tous ceux qui ont fait un peu de mathématiques algébriques doivent le
-savoir, pour une matrice on définit généralement la multiplication par
-l'opération suivante (pour des matrices $2*2$) :
+comme tous ceux ayant fait un peu de mathématiques algébriques le savent sûrement, 
+on définit généralement la multiplication matricielle par l'opération suivante 
+(pour des matrices $2*2$ ici) :
 
 $$
 \begin{pmatrix}a&b \\ c&d \end{pmatrix} \cdot \begin{pmatrix}e&f \\ g&h \end{pmatrix} =
@@ -255,18 +258,18 @@ populaire pour le calcul numérique dans l'éco-système Python, il est possible
 d'utiliser l'opérateur natif `*` pour effectuer une multiplication terme à
 terme, surcharge d'opérateur se rencontrant dans la plupart des bibliothèques
 faisant intervenir les matrices. Mais il n'existe ainsi plus de moyen simple
-pour effectuer une multiplication matricielle (l'opérateur `*` étant déjà pris).
+pour effectuer une multiplication matricielle.
 Avec `numpy`, il est pour le moment nécessaire d'utiliser la méthode `dot` et
 d'écrire des lignes de la forme :
 
 ```python
-S = (H.dot(beta) - r).T.dot(inv(H.dot(V).dot(H.T))).dot(H.dot(beta) - r)
+S = (A.dot(B) - C).T.dot(inv(A.dot(D).dot(A.T))).dot(A.dot(B) - C)
 ```
 
 Celle-ci traduit cette formule :
 
 $$
-(H \times \beta - r)^T \times (H \times V \times H^T)^{-1} \times (H \times \beta - r)
+(A \times B - C)^T \times (A \times D \times A^T)^{-1} \times (A \times B - C)
 $$
 
 Cela n'aide pas à la lecture... Le nouvel opérateur `@` est introduit et
@@ -274,7 +277,7 @@ dédié à la multiplication matricielle. Il permettra d'obtenir des expressions
 équivalentes de la forme :
 
 ```python
-S = (H @ beta - r).T @ inv(H @ V @ H.T) @ (H @ beta - r)
+S = (A @ B - C).T @ inv(A @ D @ A.T) @ (A @ B - C)
 ```
 
 Un peu mieux, non ?
@@ -285,14 +288,14 @@ Un peu mieux, non ?
 
 Cette introduction devrait être anodine pour beaucoup d'utilisateurs. En effet,
 aucun objet de la bibliothèque standard ne va l'utiliser[^ndbp_nused]. Cet
-opérateur binaire servira principalement pour des bibliothèques annexes, à
+opérateur binaire servira principalement à des bibliothèques annexes, à
 commencer par *numpy*.
 
 [^ndbp_nused]: Ce qui est rare mais existe déjà. En particulier l'objet `Elipsis` créé avec `...`.
 
 Si vous souhaitez supporter cet opérateur, trois méthodes spéciales peuvent
 être implémentées : `__matmul__` et `__rmatmul__` pour la forme `a @ b` et
-`__imatmul__` pour la forme `a @= b`, de façon similaire aux autres opérateurs.
+`__imatmul__` pour la forme `a @= b`, de façon similaire aux autres opérateurs binaires.
 
 À noter qu'il est déconseillé d'utiliser cet opérateur pour autre chose que
 les multiplications matricielles.
@@ -301,11 +304,15 @@ les multiplications matricielles.
 
 L'introduction de cet opérateur est un modèle du genre : il peut sembler très
 spécifique mais est pleinement justifié. La lecture de la PEP, développée, est
-très instructive. Pour la faire adopter, les principales bibliothèques
+très instructive. 
+
+Pour la faire adopter, les principales bibliothèques
 scientifiques en Python ont préparé cette PEP ensemble pour arriver à une
 solution convenant à la grande partie de la communauté scientifique, assurant
 dès lors l'adoption rapide de cet opérateur. La PEP précise ainsi l’intérêt et
-les problèmes engendrés par les autres solutions utilisées jusque-là. Enfin
+les problèmes engendrés par les autres solutions utilisées jusque-là. 
+
+Enfin
 cette PEP a été fortement appuyée par [la grande popularité de Python dans le
 monde
 scientifique](https://www.python.org/dev/peps/pep-0465/#but-isn-t-matrix-multiplication-a-pretty-niche-requirement).
@@ -316,8 +323,6 @@ profiter de cette modification et comptent parmi les bibliothèques les plus
 communes.
 
 ## Support des coroutines -- PEP 492
-
-### Contexte
 
 #### Introduction à la programmation asynchrone
 
@@ -355,7 +360,7 @@ if __name__ == "__main__":
 Lors d'un appel à ce genre de fonction très simple votre processeur passe son temps... à ne
 rien faire ! En effet, quand il n'attend pas le serveur Web, il patiente le temps
 que le disque effectue les opérations d'écriture demandées. Or tout cela est très
-lent à l'échelle d'un processeur. Et tous ces appels à des services extérieurs
+lent à l'échelle d'un processeur, et tous ces appels à des services extérieurs
 sont très courants en Web : connexion et requêtes à une base de données, appels à
 une API externe, etc. La perte de temps est de ce fait considérable.
 
@@ -370,13 +375,13 @@ qu'on pourrait résumer par les opérations suivantes :
  1. Prendre une tâche disponible
  2. Exécuter la tâche jusqu'à ce qu'elle soit terminée ou qu'elle doive attendre des entrées/sorties
  3. Dans le second cas, la mettre dans une liste de tâches en attente
- 4. Mettre les tâches en attente ayant reçu leurs données dans la liste des tâches disponibles
+ 4. Mettre dans la liste des tâches disponibles les tâches en attente ayant reçu leurs données
  5. Retourner en 1
 
 Prenons un exemple, avec un serveur Web :
 
 - Un client `A` demande une page, appelant ainsi une fonction `f`
-- Un client `B` demande une page, appelant une autre fonction `g`, appel mis en attente vu que le processeur est occupé avec le client A
+- Un client `B` demande une page, appelant une autre fonction `g`, appel mis en attente vu que le processeur est occupé avec le client `A`
 - L'appel à `f` atteint une écriture dans un fichier, et se met en pause le temps que le disque fasse son travail
 - `g` est démarrée
 - L'écriture sur le disque de `f` est terminée
@@ -391,7 +396,7 @@ déroulent à l'extérieur...
 
 [[i]]
 | Nous nous comportons naturellement de cette manière dans la vie. Par exemple,
-| si vous effectuez un rapport que vous devez faire relire à votre chef : après
+| lorsque vous effectuez un rapport que vous devez faire relire à votre chef : après
 | lui avoir fait parvenir une première version, vous allez devoir attendre qu'il
 | l'ait étudié avant de le corriger ; plutôt que de patienter bêtement devant son
 | bureau, vous vaquez à vos occupations, et serez informé lorsque le rapport pourra
@@ -483,7 +488,7 @@ un code asynchrone lisible. Toutefois :
 
  - Il y a détournement du rôle d'origine de l'instruction `yield from`. Sans le décorateur la fonction pourrait être facilement confondue avec un générateur classique, sans rapport avec de l'asynchrone.
  - Tandis que l'exemple d'origine utilisait `with` pour assurer la fermeture du fichier même en cas d'exception, nous sommes obligés ici de reproduire manuellement le comportement de cette instruction. En effet `with` n'est pas prévue pour appeler des coroutines, donc on ne peut effectuer de manière asynchrone les opérations d'entrée (ligne 16) ni de sortie (ligne 31).
- - De la même façon, l'instruction `for` ne permet pas de lire un itérable de manière asynchrone comme fait ligne 21. Il nous faut donc passer peu élégamment par une boucle `while`.
+ - De la même façon, l'instruction `for` ne permet pas de lire un itérable de manière asynchrone, comme fait ligne 21. Il nous faut donc passer peu élégamment par une boucle `while`.
 
 ### Les nouveaux mot-clés
 
@@ -512,7 +517,7 @@ l'instruction `async with`, en utilisant les méthodes `__aenter__` et `__aexit_
 Il est donc possible, et conseillé, en Python 3.5 de ré-écrire le code précédent de la manière
 suivante.
 
-```python hl_lines="12"
+```python
 import asyncio
 import aiohttp
 import aiofiles
@@ -535,18 +540,18 @@ if __name__ == "__main__":
     asyncio.get_event_loop().run_until_complete(fetch_page('http://zestedesavoir.com/', 'out.html'))
 ```
 
-L'exemple ci-dessus montre clairement l'objectif de ces ajouts : si les `async`
+L'exemple ci-dessus montre clairement l'objectif de l'ajout de `async for` et `async with` : si les `async`
 et `await` sont ignorés, la coroutine est fortement similaire à une implémentation
 utilisant des fonctions classiques présentées en début de section.
 
 [[a]]
 | Le dernier exemple de codes est un aperçu de ce que pourrait être la
-| programmation asynchrone avec Python 3.5. A l'heure où ces lignes sont écrites
+| programmation asynchrone avec Python 3.5. À l'heure où ces lignes sont écrites, 
 | *aiohttp* et *aiohttp* ne supportent pas encore les nouvelles instructions `async for`
 | et `async with`. De la même manière, pour l'instant, seul *asyncio* gère les mot-clés
 | `async` et `await` au niveau de sa boucle événementielle.
 
-Enfin, notez que les expressions `await`, au delà de leur précédence beaucoup plus
+Enfin, notez que les expressions `await`, au-delà de leur précédence beaucoup plus
 faible, sont moins restreintes que les `yield from` et peuvent être placées partout
 où une expression est attendue. Ainsi les codes suivants sont valides.
 
@@ -574,13 +579,13 @@ Ces modifications restent donc parfaitement rétro-compatibles avec Python 3.4.
 
 Si vous utilisez *asyncio*, rien ne change pour vous et vous pouvez continuer à
 employer les générateurs si vous souhaitez conserver le support de Python 3.4.
-L'ajout des méthodes de la forme `__a****__` peut vous permettre cependant de
-supporter les nouveautés de Python 3.5, mais n'est pas obligatoire.
+L'ajout des méthodes de la forme `__a****__` n'est donc pas obligatoire, mais peut 
+vous permettre cependant de supporter les nouveautés de Python 3.5.
 
 ## Annotations de types -- PEP 484
 
 Les annotations de fonctions [existent depuis Python 3](https://www.python.org/dev/peps/pep-3107/)
-et permettent d'attacher des objets Python quelconques aux arguments
+et permettent d'attacher des objets Python aux arguments
 et à la valeur de retour d'une fonction ou d'une méthode :
 
 ```python
@@ -625,14 +630,17 @@ contentons de l'exemple suivant.
 # - Tuple pour décrire un tuple
 from typing import TypeVar, Iterable, Tuple
 
-# Nous définissons ici un type générique pouvant être un des types de nombres cités.
+# Nous définissons ici un type générique pouvant être un des types numériques cités.
 T = TypeVar('T', int, float, complex)
-# Vecteur représente un itérateur (list, tuple, etc.) contenant des tuples comportant chacun deux éléments de type T.
+# Vecteur représente un itérateur (list, tuple, etc.) contenant des tuples 
+# comportant chacun deux éléments de type T.
 Vecteur = Iterable[Tuple[T, T]]
 
-# Pour déclarer un itérable de tuples, sans spécifier le contenu de ces derniers, nous pouvons utiliser le type natif :
+# Pour déclarer un itérable de tuples, sans spécifier le contenu de ces derniers, 
+# nous pouvons utiliser le type natif :
 # Vecteur2 = Iterable[tuple]
-# Les éléments présents dans le module typing sont là pour permettre une description plus complète des types de base.
+# Les éléments présents dans le module typing sont là pour permettre une 
+# description plus complète des types de base.
 
 # Nous définissons une fonction prenant un vecteur en argument et renvoyant un nombre
 def inproduct(v: Vecteur) -> T:
@@ -645,13 +653,10 @@ res = inproduct(vec)
 
 Néanmoins, les annotations peuvent surcharger les déclarations et les rendre
 peu lisibles. Cette PEP a donc introduit une convention supplémentaire : les
-fichiers `Stub`. Il a été convenu que de tels fichiers, facultifs, contiendraient
+fichiers `Stub`. Il a été convenu que de tels fichiers, facultatifs, contiendraient
 les annotations de types, permettant ainsi de profiter de ces informations sans
-polluer le code source. Ces fichiers permettent aussi d'annoter les fonctions
-de bibliothèques écrites en C ou de fournir les annotations de types pour des
-modules utilisant les annotations pour une autre fonctionnalité. Par exemple,
-le module `datetime` de la bliotèque standard comporterait un fichier `Stub` de
-la forme suivante.
+polluer le code source. Par exemple, le module `datetime` de la bibliothèque 
+standard comporterait un fichier `Stub` de la forme suivante.
 
 
 ```python
@@ -667,6 +672,10 @@ class date(object):
     def weekday(self) -> int: ...
 ```
 
+Ces fichiers permettent aussi d'annoter les fonctions de bibliothèques écrites 
+en C ou de fournir des annotations de types aux modules utilisant déjà les 
+annotations pour autre chose que le *type hinting*. 
+
 Tout comme rien ne vous oblige à utiliser les annotations pour le typage, rien
 ne vous force à vous servir du module `typing` ou des fichiers `Stub` :
 l'interpréteur n'utilisera ni ne vérifiera toujours pas ces annotations ; le
@@ -679,7 +688,7 @@ ou encore les analyseurs de code statiques comme [mypy](http://mypy-lang.org/),
 lequel a fortement inspiré cette PEP et sera probablement le premier outil à
 proposer un support complet de cette fonctionnalité.
 
-Les annotations de types sont donc qu'un ensemble de conventions, comme il en
+Les annotations de types ne sont donc qu'un ensemble de conventions, comme il en
 existe déjà plusieurs dans le monde Python ([PEP 333](https://www.python.org/dev/peps/pep-0333/),
 [PEP 8](https://www.python.org/dev/peps/pep-0008/), [PEP 257](https://www.python.org/dev/peps/pep-0257/),
 etc.). Cet ajout n'a donc aucun impact direct sur vos codes mais permettra aux
@@ -688,23 +697,36 @@ outils externes de vous fournir du support supplémentaire.
 
 # De plus petits changements
 
- - [PEP 441](http://www.python.org/dev/peps/pep-0441) : Ajout d'un module `zipapp` améliorant le support et la création d'applications packagés sous forme d'archive `zip` introduit dans Python 2.6.
- - [PEP 461](https://www.python.org/dev/peps/pep-0461/) : Retour de l'opérateur de formatage `%` pour les types de données `byte` et `bytearray` de la même façon qu'il était utilisable pour les types chaînes (`str`) dans Python 2.7.
- - [PEP 488](https://www.python.org/dev/peps/pep-0488/) : La suppression des fichiers `pyo`.
- - [PEP 489](https://www.python.org/dev/peps/pep-0489/) : Un changement de la procédure d'import des modules externes.
- - [PEP 471](http://www.python.org/dev/peps/pep-0471) : Une nouvelle fonction `os.scandir()` pour itérer plus efficacement sur le contenu d'un dossier sur le disque qu'en utilisant `os.walk()`. Cette dernière fonction l'utilise maintenant en interne et est de 3 à 5 fois plus rapide sur les système POSIX et de 7 à 20 fois plus rapide sur Windows.
- - [PEP 475](http://www.python.org/dev/peps/pep-0475) : L'interpréteur va maintenant automatiquement retenter le dernier appel système lorsqu'un signal `EINTR` est reçu, évitant aux codes utilisateurs de s'en occuper.
- - [PEP 479](https://www.python.org/dev/peps/pep-0479/) : Le comportement des générateurs changent lorsqu'une exception `StopIteration` est déclenché à l'intérieur. Avec cette PEP, cette exception est transformé en `RuntimeError` plutôt que de quitter silencieusement le générateur. Cette modification cherche à faciliter le deboguage et clarifie la façon de quitter un générateur : utiliser `return` plutôt que de générer une exception. Cette PEP n'étant pas rétro-compatible, vous devez manuellement l'activer avec `from __future__ import generator_stop` pour en profiter.
- - [PEP 485](https://www.python.org/dev/peps/pep-0485/) : Une fonction `isclose` est rajouté pour tester la "proximité" de deux nombres flottants.
- - [PEP 486](https://www.python.org/dev/peps/pep-0486/) : Le support de `virtualenv` dans l'installateur de Python sous Windows est amélioré et simplifié.
- - [Ticket 9951](https://bugs.python.org/issue9951) : Pour les types `byte` et `bytearray`, une nouvelle méthode `hex()` permet maintenant de récupérer une chaîne représentant le contenu sous forme hexadécimale.
- - [Ticket 16991](https://bugs.python.org/issue16991) : L'implémentation en C, plutôt qu'en Python, des `OrderedDict` (dictionnaires ordonnées) apportant des gains de 4 à 100 sur les performances.
+ - [PEP 441](http://www.python.org/dev/peps/pep-0441) : ajout d'un module `zipapp`, pour améliorer le support et la création d'applications packagées sous forme d'archive `zip`, introduits dans Python 2.6.
+ - [PEP 461](https://www.python.org/dev/peps/pep-0461/) : retour de l'opérateur de formatage `%` pour les types de données `byte` et `bytearray`, de la même façon qu'il était utilisable pour les types chaînes (`str`) dans Python 2.7.
+ - [PEP 488](https://www.python.org/dev/peps/pep-0488/) : la suppression des fichiers `pyo`.
+ - [PEP 489](https://www.python.org/dev/peps/pep-0489/) : un changement de la procédure d'import des modules externes.
+ - [PEP 471](http://www.python.org/dev/peps/pep-0471) : une nouvelle fonction `os.scandir()`, pour itérer plus efficacement sur le contenu d'un dossier sur le disque qu'en utilisant `os.walk()`. Cette dernière fonction l'utilise maintenant en interne et est de trois à cinq fois plus rapide sur les systèmes POSIX et de sept à vingt fois plus rapide sur Windows.
+ - [PEP 475](http://www.python.org/dev/peps/pep-0475) : l'interpréteur va maintenant automatiquement retenter le dernier appel système lorsqu'un signal `EINTR` est reçu, évitant aux codes utilisateurs de s'en occuper.
+ - [PEP 479](https://www.python.org/dev/peps/pep-0479/) : le comportement des générateurs changent lorsqu'une exception `StopIteration` est déclenchée à l'intérieur. Avec cette PEP, cette exception est transformée en `RuntimeError` plutôt que de quitter silencieusement le générateur. Cette modification cherche à faciliter le déboguage et clarifie la façon de quitter un générateur : utiliser `return` plutôt que de générer une exception. Cette PEP n'étant pas rétro-compatible, vous devez manuellement l'activer avec `from __future__ import generator_stop` pour en profiter.
+ - [PEP 485](https://www.python.org/dev/peps/pep-0485/) : une fonction `isclose` est ajoutée pour tester la « proximité » de deux nombres flottants.
+ - [PEP 486](https://www.python.org/dev/peps/pep-0486/) : le support de `virtualenv` dans l'installateur de Python sous Windows est amélioré et simplifié.
+ - [Ticket 9951](https://bugs.python.org/issue9951) : pour les types `byte` et `bytearray`, une nouvelle méthode `hex()` permet maintenant de récupérer une chaîne représentant le contenu sous forme hexadécimale.
+ - [Ticket 16991](https://bugs.python.org/issue16991) : l'implémentation en C, plutôt qu'en Python, des `OrderedDict` (dictionnaires ordonnés) apporte des gains de quatre à cent sur les performances.
 
-De plus, comme d’habitude, tout un tas de fonctions, de petites modifications et de corrections de bugs ont été apportés à la bibliothèque standard qu'il serait trop long de citer entièrement.
+De plus, comme d’habitude, tout un tas de fonctions, de petites modifications 
+et de corrections de bugs ont été apportées à la bibliothèque standard, 
+qu'il serait trop long de citer entièrement.
 
-Notons aussi que le support de Windows XP est supprimé (cela ne veut pas dire que Python 3.5 ne fonctionnera pas dessus, mais rien ne sera fait par les développeurs pour cela).
+Notons aussi que le support de Windows XP est supprimé. Cela ne veut pas dire que 
+Python 3.5 ne fonctionnera pas dessus, mais rien ne sera fait par les développeurs 
+pour cela.
 
-Enfin, le développement de CPython 3.5 (à partir de la première *release candidate*) s'est effectué sur [BitBucket](https://bitbucket.org/larry/cpython350) plutôt que sur le traditionnel [dépôt auto-hébergé](https://hg.python.org/cpython) de la fondation, afin de bénéficier des fonctionnalités proposées par le site ; le gestionnaire de versions est toujours Mercurial. Il n'est pas encore connu si les prochaines versions suivront ce changement et si le développement de CPython se déplacera sur BitBucket : il s'agit d'une expérimentation que les développeurs vont évaluer. Pour le moment, les branches pour les versions 3.5.1 et 3.6 restent sur [https://hg.python.org/cpython](https://hg.python.org/cpython) au moins jusqu'à la sortie de Python 3.5.
+Enfin, le développement de CPython 3.5 (à partir de la première *release* candidate) 
+s'est effectué sur [BitBucket](https://bitbucket.org/larry/cpython350) plutôt que 
+sur le traditionnel [dépôt auto-hébergé](https://hg.python.org/cpython) de la 
+fondation, afin de bénéficier des fonctionnalités proposées par le site ; le 
+gestionnaire de versions est toujours Mercurial. Il n'est pas encore connu si 
+les prochaines versions suivront ce changement et si le développement de CPython 
+se déplacera sur BitBucket : il s'agit d'une expérimentation que les développeurs 
+vont évaluer. Pour le moment, les branches pour les versions 3.5.1 et 3.6 restent 
+sur [https://hg.python.org/cpython](https://hg.python.org/cpython) au moins jusqu'à 
+la sortie de Python 3.5.
 
 
 # Ce que l'on peut attendre pour la version 3.6
@@ -713,23 +735,23 @@ Il est impossible de savoir précisément ce qui sera disponible dans la prochai
 En effet aucune entreprise ou groupe ne décide par avance des fonctionnalités. Les changements inclus dépendent des
 propositions faites, majoritairement, sur deux *mailling list* :
 
- - [*python-dev*](https://mail.python.org/mailman/listinfo/python-dev) quand cela concerne des changements interne à l'intepréteur CPython.
- - [*python-ideas*](https://mail.python.org/mailman/listinfo/python-ideas) quand cela concerne des idées générale concernant le langage.
+ - [*python-dev*](https://mail.python.org/mailman/listinfo/python-dev) quand cela concerne des changements internes à l'intepréteur CPython.
+ - [*python-ideas*](https://mail.python.org/mailman/listinfo/python-ideas) quand cela concerne des idées générales à propos du langage.
 
-S'en suivent une série de débats qui, si les idées sont acceptées par une
+S'ensuit une série de débats qui, si les idées sont acceptées par une
 majorité de developpeurs principaux, conduit à la rédaction d'une
-[PEP](https://www.python.org/dev/peps/), qui sera elle-même acceptée ou refusée
-par le BDFL (Guido ou un autre developpeur si Guido est l'auteur de la PEP). En
-l'absence de feuilles de routes définies à l'avance, les PEP peuvent arriver
+[PEP](https://www.python.org/dev/peps/), qui sera elle-même acceptée ou refusée 
+(par Guido, le BDFL, ou par un autre développeur si Guido est l'auteur de la PEP). En
+l'absence de feuilles de route définies à l'avance, les PEP peuvent arriver
 tard dans le cycle de développement. Ainsi, la PEP 492 sur `async` et `await`
-n'a été créé qu'un mois avant la sortie de la première beta de pytohn 3.5.
+n'a été créé qu'un mois avant la sortie de la première bêta de Python 3.5.
 
 [[a]]
-| Malgré ces incertitudes, on peut deviner quelques modifications probables. Attention cette section reste très spéculative...
+| Malgré ces incertitudes, on peut deviner quelques modifications probables. Attention, cette section reste très spéculative...
 
 ## Continuité des changements introduits dans Python 3.5
 
-Trois thématiques de modifications, amorcées dans Python 3.4 et surtout Python 3.5 pourraient être de nouveau source d'ajouts
+Trois thématiques de modifications amorcées dans Python 3.4 et surtout Python 3.5 pourraient être de nouveau sources d'ajouts
 importants dans Python 3.6 :
 
  - La programmation asynchrone avec *asyncio* et les coroutines
@@ -739,10 +761,10 @@ importants dans Python 3.6 :
 Les deux premiers éléments sont officiellement en attente de retours de la part des utilisateurs de Python.
 Les développeurs de l'interpréteur attendent de connaître les problèmes et limitations rencontrées en utilisant ces
 fonctionnalités pour les peaufiner dans les prochaines versions. Python 3.6 devrait donc logiquement voir des améliorations
-dans ces deux sections en profitant des retours. Déjà quelques remarques ont été faites comme
-[la complexité de méler des fonctions synchrones et asynchrone](http://code.activestate.com/lists/python-ideas/34419/).
+dans ces deux sections en profitant des retours. Déjà quelques remarques ont été faites, comme
+[la complexité de mêler des fonctions synchrones et asynchrones](http://code.activestate.com/lists/python-ideas/34419/).
 
-La généralisation de l'*unpacking* pourrait elle aussi continuer. Dans un premier temps la
+La généralisation de l'*unpacking* pourrait elle aussi continuer. La
 [PEP 448](https://www.python.org/dev/peps/pep-0448/#variations) proposait initialement d'autres généralisations qui n'ont
 pas été retenues pour Python 3.5 par manque de temps. Elles seront donc propablement rapidement rediscutées. De plus, ces ajouts dans Python 3.5 ont
 donné des idées à d'autres développeurs et quelques [nouvelles modifications](http://code.activestate.com/lists/python-ideas/35074/)
@@ -766,49 +788,47 @@ spam(a=1, b=2)
 Avec Python 3.5, comme toutes versions de CPython et presque toutes les autres implémentations (sauf PyPy), nous ne pouvons
 pas savoir si le résultat sera :
 
-```
-a 1
-b 2
-```
+Nom | Valeur
+----|------
+a   |  1
+b   |  2
 
 ou
 
+Nom | Valeur
+----|------
+a   |  2
+b   |  1
 
-```
-b 2
-a 1
-```
-
-En effet, un dictionnaire est utilisé pour passer les arguments or ceux-ci ne garantissent pas d'ordre sur leurs clés. Pourtant
+En effet, un dictionnaire est utilisé pour passer les arguments. Or ceux-ci ne garantissent pas d'ordre sur leurs clés. Pourtant, 
 Python dispose d'une classe [`OrderedDict`](https://docs.python.org/3/library/collections.html#collections.OrderedDict) depuis
-Python 3.1. L'implémentation de cette PEP se résumerait donc à remplacer l'objet utilisé en interne d'un dictionnaire à
-un dictionnaire ordonné. Cependant jusqu'à maintenant cet objet était défini en Python. L'implémentation était donc loin
+Python 3.1. L'implémentation de cette PEP se résumerait donc à remplacer l'objet utilisé en interne, un dictionnaire basique, par 
+un dictionnaire ordonné. Cependant, jusqu'à maintenant, cet objet était défini en Python. L'implémentation était donc loin
 d'être la plus efficace possible et ne pouvait pas être utilisée pour un élément aussi critique du langage. C'est pour cette
-raison que la classe a été réimplémentée en C pour python 3.5 comme noté dans la section "De plus petits changements".
-Maintenant plus rien ne semble bloquer l'implémentation de cette PEP qui devrait donc voir le jour dans Python 3.6.
+raison que la classe a été réimplémentée en C pour Python 3.5, comme noté dans la section « De plus petits changements ».
+Maintenant, plus rien ne semble bloquer l'implémentation de cette PEP, qui devrait donc voir le jour dans Python 3.6.
 
 Le principal intérêt de cette modification est que le fonctionnement actuel est contre-intuitif pour bon nombre d'utilisateurs
 connaissant mal le fonctionnement interne de Python. D'autres raisons sont invoquées dans la PEP :
 
- - De manière évidente les `OrderedDict` pourraient maintenant être créés en utilisant des arguments nommés, comme les
-   dictionnaires.
- - La sérialisation : dans certains formats l'ordre d'apparition des données a de l'importance (ex: l'ordre des colonnes
-   dans un fichier CSV). Cette nouvelle possibilité permettrait de les définir plus facilement en même temps que des
-   valeurs par defaults. Elle permettrait aussi à des formats comme XML, Json ou Yaml de garantir l'ordre d'apparition
+ - L'initialisation d'un `OrderedDict` est un cas d'appel où l'ordre des paramètres importe, et de tels objets pourraient maintenant être créés en utilisant des arguments nommés, comme le permettent les dictionnaires.
+ - La sérialisation : dans certains formats l'ordre d'apparition des données a de l'importance (ex : l'ordre des colonnes
+   dans un fichier CSV). Cette nouvelle possibilité permettrait de les définir plus facilement, en même temps que des
+   valeurs par défaut. Elle permettrait aussi à des formats comme XML, JSON ou Yaml de garantir l'ordre d'apparition
    des attributs ou clés qui sont enregistrés dans les fichiers.
  - Le débogage : le fonctionnement actuel pouvant être aléatoire, il peut être compliqué de reproduire certains bugs.
    Si un bug apparait selon l'ordre de définition des arguments, le nouveau comportement facilitera leur correction.
  - La priorité à donner aux arguments pourrait être spécifiée selon l'ordre de leur déclaration.
- - Les `namedtuple` pourraient être définis avec une valeur par défaut simplement.
+ - Les `namedtuple` pourraient être définis aisément avec une valeur par défaut.
 
-et probablement d'autres utilisations qui n'ont pas encore été envisagées.
+Et probablement d'autres utilisations qui n'ont pas encore été envisagées.
 
 ## Proprités de classes
 
 Toujours dans les petites modifications, un nouveau décorateur disponible de base devrait être introduit : `@classproperty`.
 Si vous connaissez le modèle objet de Python, son nom devrait vous suffir pour deviner son but : permettre de définir des
 propriétés au niveau de classes. Par exemple si vous souhaitez conserver au niveau de la classe le nombre d'instances
-créées et des statistiques sur vos appels:
+créées et des statistiques sur vos appels :
 
 ```python
 class Spam:
@@ -845,63 +865,65 @@ print(Spam.mean_egg_call)    # => 1.5  , propriété au niveau de la classe !
 Cet ajout a été proposé sur la *mailling-list python-ideas*. La mise en place d'une implémentation propre et complète de
 ce comportement est compliquée sans définir une méta-classe. Une solution générique implique donc de le rajouter dans le
 modèle objet de Python. Guido a rapidement donné son aprobation et un [ticket a été créé](http://bugs.python.org/issue24941)
-en attendant qu'un des developpeurs de CPython l'implémente dans le coeur de l'intrépreteur. Cela pourrait donc être
+en attendant qu'un des développeurs de CPython l'implémente dans le coeur de l'interpréteur. Cela pourrait donc être
 l'une des premières nouvelles fonctionnalités confirmées pour la version 3.6.
 
 ## Sous-interpréteurs
 
 [[a]]
-| Cette section peut nécessiter des notions avancés de programmation système pour être comprise, en particulier la différence entre un *thread* et un *processus*, ainsi que leur gestion dans Python.
+| Cette section peut nécessiter des notions avancées de programmation système pour être comprise, en particulier la différence entre un *thread* et un *processus*, ainsi que leur gestion dans Python.
 
-L'écriture de code concurrent en Python est toujours un sujet chaud. A ce jour, trois solutions existent dans la
+L'écriture de code concurrent en Python est toujours un sujet chaud. À ce jour, trois solutions existent dans la
 bibliotèque standard :
 
  - *asyncio*, bien que limitée à un seul *thread*, permet d'écrire des coroutines s'exécutant en concurrence en tirant
  partie des temps d'attente introduits par les entrées/sorties.
  - *threading* permet de facilement exécuter du code sur plusieurs *threads*, mais leur exécution reste limitée à un seul
- coeur de processeur à cause du GIL[^ndbp_gil].
- - *multiprocessing*, en *forkant* l'interpréteur, permet d'éxecuter plusieurs codes Python en parralèle sans limitation
+ coeur de processeur à cause du GIL.
+ - *multiprocessing*, en *forkant* l'interpréteur, permet d'éxecuter plusieurs codes Python en parallèle sans limitation
  et exploitant pleinnement les ressources calculatoires des processeurs.
 
 [[a]]
-| Le [GIL](https://en.wikipedia.org/wiki/Global_Interpreter_Lock) est une construction implémentée dans de nompreux interpéteurs (CPython, Pypy, Ruby, etc.). Ce mécanisme bloque l'interpréteur pour qu'à chaque instant, un seul code puisse être executé. Ce sytème permet de s'assurer que du code éxécuté sur plusieurs *threads* ne va pas poser de problèmes de concurrence sur la mémoire, sans vraiment ralentir les codes n'utilisant qu'un seul *thread*. Malheureusement cela nous empèche d'exploiter les architectures multi-coeurs de nos processeurs.
+| Le [GIL](https://en.wikipedia.org/wiki/Global_Interpreter_Lock) est une construction implémentée dans de nompreux interpéteurs (CPython, Pypy, Ruby, etc.). Ce mécanisme bloque l'interpréteur pour qu'à chaque instant, un seul code puisse être exécuté. Ce sytème permet de s'assurer que du code éxécuté sur plusieurs *threads* ne va pas poser de problèmes de concurrence sur la mémoire, sans vraiment ralentir les codes n'utilisant qu'un seul *thread*. Malheureusement cela nous empèche d'exploiter les architectures multi-coeurs de nos processeurs.
 
-La multiplicité des solutions ne résoud pas tout. En effet les limitation des *threads* en python les rendent inutiles
+La multiplicité des solutions ne résoud pas tout. En effet les limitation des *threads* en Python les rendent inutiles
 quand le traitement exploite principalement le processeur. L'utilisation de *multiprocessing* est alors possible, mais
 a un coût :
 
  - Le lancement d'un processus entraine un *fork* au niveau du système d'exploitation, ce qui prend plus de temps et de
  mémoire que le lancement d'un *thread* (presque gratuit en comparaison).
  - La communication entre les processus est aussi plus longue. Tandis que les *threads* permettent d'exploiter un
-espace partagé en mémoire, rendant leurs communcations directes, les processus nécessitent de mettre en place des mecanismes complexes, appelés
- [*IPC* pour "communications inter-processus"](https://fr.wikipedia.org/wiki/Communication_inter-processus).
+espace partagé en mémoire, rendant leurs communications directes, les processus nécessitent de mettre en place des mécanismes complexes, appelés
+ [*IPC*](https://fr.wikipedia.org/wiki/Communication_inter-processus).
+
+*[IPC]: Communication inter-processus
 
 [Une proposition sur *python-ideas*](http://code.activestate.com/lists/python-ideas/34051/) a été formulée au début de
-l'été pour offrir une nouvelle solution intermédiare entre les *threads* et les processus, des sous-interpréteurs
+l'été pour offrir une nouvelle solution intermédiare entre les *threads* et les processus : des sous-interpréteurs
 (*subinterpreters*), en espérant que cela puisse définitivement contenter les développeurs friands de codes concurrents.
 
-A partir d'un nouveau module *subinterpreters*, reprenant l'interface exposée par les modules *threading* et *multiprocessing*,
+À partir d'un nouveau module *subinterpreters*, reprenant l'interface exposée par les modules *threading* et *multiprocessing*,
 CPython permettrait de lancer dans des *threads* différents interpréteurs, chacun chargé d'executer un code Python. Le fait
 que ce soient des *threads* rendrait ce module beaucoup plus léger à utiliser que *multiprocessing*.
 L'interpréteur se chargerait de lancer ces *threads* et partagerait le maximum de son implémentation entre eux.
-Le plus intéressant est que ce mécanisme ferait "disparaitre" le *GIL*. En effet chaque sous-interpréteur disposerait
-d'un espace de noms propre et indépendant. Chacun aurait donc un *GIL* mais ceux-ci seraient indépendants. D'un point
+Le plus intéressant est que ce mécanisme permettrait d'éluder le *GIL*. En effet, chaque sous-interpréteur disposerait
+d'un espace de noms propre et indépendant. Chacun aurait donc un *GIL*, mais ceux-ci seraient indépendants. D'un point
 de l'ensemble, la majorité des opérations transformeraient le *GIL* en *LIL* : *Local interpreter lock*. Chaque
-sous-interpréteur pourrait ainsi fonctionner sur un coeur du processus séparré sans aucun problème, permettant ainsi au développeur de tirer
+sous-interpréteur pourrait ainsi fonctionner sur un coeur du processus séparé sans aucun problème, permettant ainsi au développeur de tirer
 pleinement partie des processeurs modernes. Enfin, il faut savoir que CPython possède déjà en interne la notion de
-sous-interpréteurs, le travail a réaliser consisterait donc à exposer ce code C pour le rendre disponible
+sous-interpréteurs, le travail à réaliser consisterait donc à exposer ce code C pour le rendre disponible
 en Python.
 
 Évidement, cette proposition n'est pas une solution miracle. Tout n'est pas si simple et beaucoup d'élements doivent encore
-être discutés. En particulier les moyens de communication entre les sous-interpréteurs (probablement via des queues comme
-pour *multiprocessing*) et tout un tas de petits détails d'implémentations. Mais la proposition a reçu un acceuil très positif
+être discutés. En particulier les moyens de communication entre les sous-interpréteurs (probablement via des queues, comme
+pour *multiprocessing*) et tout un tas de petits détails d'implémentation. Mais la proposition a reçu un accueil très positif
 et l'auteur est actuellement en train de préparer une PEP à ce sujet.
 
-[^ndbp_gil]: *Global Interpreter Lock*
+*[GIL]: *Global Interpreter Lock*
 
 ## Interpolation de chaines
 
-Les interpolations directes de chaines de caractères existent dans de nombreux langages : PHP, C#, Ruby, Swift, Perl, etc.
+Les interpolations directes de chaînes de caractères existent dans de nombreux langages : PHP, C#, Ruby, Swift, Perl, etc.
 En voici un exemple en Perl :
 
 ```perl
@@ -912,7 +934,7 @@ print "Resultat = a + b = $a + $b = @{[$a+$b]}\n";
 # Imprime "Resultat = a + b = 1 + 2 = 3"
 ```
 
-Il n'existe pas d'équivalent direct en Python, le plus proche pourrait ressembler à l'exemple suivant :
+Il n'existe pas d'équivalent direct en Python ; le plus proche pourrait ressembler à l'exemple suivant :
 
 ```python
 a, b = 1, 2
@@ -923,12 +945,12 @@ print("Resultat = a + b = {a} + {b} = {c}".format(a=a, b=b, c=a + b))
 ```
 
 Nous voyons ainsi qu'il est nécessaire de passer explicitement les variables et, même s'il est possible d'utiliser
-`locals()` ou `globals()` pour s'en passer, il reste impossible d'évaluer une expression, comme ici l'addition, ailleurs
-qu'à l'extérieur de la chaine de caractères.
+`locals()` ou `globals()` pour s'en passer, il n'est possible d'évaluer une expression, comme ici l'addition, 
+qu'à l'extérieur de la chaîne de caractères puis d'injecter le résultat dans cette dernière.
 
-La première proposition effectuée, formalisée par la [PEP 498](https://www.python.org/dev/peps/pep-0498/) propose de rajouter
-cette possibilité dans python grâce à un nouveau préfixe de chaine, `f` pour `format-string`, dont voici un exemple
-d'utilisation issue de la PEP :
+La première proposition effectuée, formalisée par la [PEP 498](https://www.python.org/dev/peps/pep-0498/), propose de rajouter
+cette possibilité dans Python grâce à un nouveau préfixe de chaîne, `f`, pour `format-string`, dont voici un exemple
+d'utilisation, issu de la PEP :
 
 ```python
 >>> import datetime
@@ -943,16 +965,15 @@ d'utilisation issue de la PEP :
 
 Cette proposition a fait des émules. Plusieurs développeurs ont mit en évidence que la méthode d'interpolation peut
 dépendre du contexte. Par exemple un module de base de données comme [`sqlite3`](https://docs.python.org/3.4/library/sqlite3.html)
-propose un système de substitution personnalisé pour éviter les attaques par injection ou encore les moteurs de *templates* pour
-produire du HTML vont aussi faire des substitutions pour échapper certains caractères comme remplacer `<` ou `>` par,
-respectivement, `&lt;` ou `&gt;`. La [PEP 501](https://www.python.org/dev/peps/pep-0501/) propose aux developpeurs de définir
-leurs propres méthodes d'interpolation adaptées au contexte.
+propose un système de substitution personnalisé pour éviter les attaques par injection ; les moteurs de *templates*, eux, pour
+produire du HTML, vont aussi faire des substitutions pour échapper certains caractères, comme remplacer `<` ou `>` par,
+respectivement, `&lt;` ou `&gt;`. La [PEP 501](https://www.python.org/dev/peps/pep-0501/) propose donc aux développeurs de définir
+leurs propres méthodes d'interpolation, adaptées au contexte.
 
 Guido s'est clairement prononcé pour la première proposition afin qu'elle soit implémentée dans Python 3.6. La deuxième est
-plus générale mais plus complexe et peut ainsi poser plusieurs problèmes. Aucune décision n'a encore été prise et les débats
-à ce sujet on encore lieu sur la *mailling list* concernant cette possibilité et la forme qu'elle pourrait prendre. Il est
-donc très probable qu'au moins la première proposition soit implémentée. La deuxième dépendra de la suite des discussions
-mais, à défaut de consensus, les *f-string* simples seront implémentées dans Python 3.6.
+plus générale mais plus complexe, et peut ainsi poser plusieurs problèmes. Aucune décision n'a encore été prise et les débats
+à ce sujet ont encore lieu sur la *mailling list* concernant cette possibilité et la forme qu'elle pourrait prendre. Il est
+donc très probable qu'au moins la première proposition soit implémentée ; la deuxième dépendra de la suite des discussions.
 
 -------
 
