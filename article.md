@@ -313,10 +313,8 @@ dès lors l'adoption rapide de cet opérateur. La PEP précise ainsi l’intér�
 les problèmes engendrés par les autres solutions utilisées jusque-là. 
 
 Enfin
-cette PEP a été fortement appuyée par [la grande popularité de Python dans le
-monde
-scientifique](https://www.python.org/dev/peps/pep-0465/#but-isn-t-matrix-multiplication-a-pretty-niche-requirement).
-Ainsi on apprend que `numpy` est le module n’appartenant pas à la bibliothèque
+cette PEP a été fortement appuyée par [la grande popularité de Python dans le monde scientifique](https://www.python.org/dev/peps/pep-0465/#but-isn-t-matrix-multiplication-a-pretty-niche-requirement).
+On apprend aussi que `numpy` est le module n’appartenant pas à la bibliothèque
 standard le plus utilisé parmi tous les codes Python présents sur Github et ce
 sans compter d'autres bibliothèques comme `pylab` ou `scipy` qui vont aussi
 profiter de cette modification et comptent parmi les bibliothèques les plus
@@ -977,4 +975,8 @@ donc très probable qu'au moins la première proposition soit implémentée ; la
 
 -------
 
-TODO: Conclusion générale
+Comme nous l'avons vu, cette version s'annonce comme une des plus importante en terme de nouvelles fonctionnalités. Puisque plus aucune fonctionnalité n'est introduite dans Python 2.7 et que la la majorité des [bilbiotèques populaires](https://python3wos.appspot.com/) sont compatible avec Python 3, nous pouvons espérer que cette version permette enfin d'entrainer la fin du basculement de Python 2 à Python 3. 
+
+Vous pouvez dès maintenant [télécharger cette nouvelle version](https://www.python.org/downloads/) sur le site officiel de Python. 
+
+Enfin, si certains points de cet article ne sont pas clair pour vous, n'hésitez pas à nous en faire part en commentaire et nous nous efforcerons de clarifier vos interogations !
